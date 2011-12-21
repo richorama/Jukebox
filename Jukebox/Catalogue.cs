@@ -8,9 +8,13 @@ namespace Jukebox
 {
     public static class Catalogue
     {
-        public static void Index(string[] paths)
+        static Catalogue()
         {
             Songs = new ConcurrentBag<Song>();
+        }
+
+        public static void Index(string[] paths)
+        {
             Parallel.ForEach<string>(GetFiles(paths), filename =>
             {
                 TagLib.File file = TagLib.File.Create(filename);
@@ -27,7 +31,11 @@ namespace Jukebox
                 Songs.Add(song);
             });
 
-
+            // index child directories
+            Parallel.ForEach<string>(paths, path =>
+            {
+                Index(Directory.GetDirectories(path));
+            });
         }
 
         private static IEnumerable<string> GetFiles(string[] paths)

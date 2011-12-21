@@ -7,7 +7,7 @@ namespace Jukebox
 {
     class Program
     {
-        const int port = 8080;
+        const int port = 1337;
 
         static void Main(string[] args)
         {

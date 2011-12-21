@@ -6,8 +6,47 @@
 		<script type="text/javascript" src="http://documentcloud.github.com/underscore/underscore.js"></script>
 		<script type="text/javascript" src="http://documentcloud.github.com/backbone/backbone.js"></script>
         <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'>
+        <style>
+body
+{
+    background-color:#333;
+    color:Silver;
+    font-family:helvetica,arial,freesans,clean,sans-serif;
+    font-size : 25px;
+}
+a
+{
+    color:#40C4FF;    
+    text-decoration:none;
+}
+a:hover
+{
+    text-decoration:underline;    
+}
+#body
+{
+    width:600px;    
+    margin-left:30px;
+}
+.title
+{
+    font-size:80px;    
+    margin-left:30px;
+    font-family: 'Playball', cursive;
+}
+h2
+{
+    font-size:40px;    
+    margin-top:0px;
+    margin-bottom:0px;
+    font-family: 'Playball', cursive;
+}
+
+        </style>
     </head> 
 	<body>
+        <div class="title"><a href="#">Jukebox</a></div>
         <div id="body"></div>
         <script language="javascript">
 
@@ -15,56 +54,57 @@
                 this.defaultAction = function () {
                     showView("#default", {});
                 }
-				this.list = function(filter){
-					$.ajax({
-						url: '/List?Filter=' + filter,
-						dataType: 'json',
-						success: function (results) {
-							showView("#list", {items:results, filter:filter, title:filter});
-						},
-						error: function () {
-							alert('Fail');
-						}
-					});
-				
-				}
-				this.songs = function(filter, value){
-				    $.ajax({
-						url: '/Songs?Filter=' + filter + '&Value=' + value,
-						dataType: 'json',
-						success: function (results) {
-							showView("#songs", {items:results, filter:filter, title:value});
-						},
-						error: function () {
-							alert('Fail');
-						}
-					});
-				}
-				this.song = function(id){
-				    $.ajax({
-						url: '/Song?Id=' + id,
-						dataType: 'json',
-						success: function (result) {
-							showView("#song", {song:result});
-						},
-						error: function () {
-							alert('Fail');
-						}
-					});
-				}
-				this.play = function(id){
-				    $.ajax({
-						url: '/Push?Id=' + id,
-						dataType: 'json',
-						success: function (result) {
-							//showView("#song", {song:result});
-						},
-						error: function () {
-							alert('Fail');
-						}
-					});
-				}
-				
+                this.list = function (filter) {
+                    $.ajax({
+                        url: '/List?Filter=' + filter,
+                        dataType: 'json',
+                        success: function (results) {
+                            showView("#list", { items: results, filter: filter, title: filter + "s" });
+                        },
+                        error: function () {
+                            alert('Fail');
+                        }
+                    });
+
+                }
+                this.songs = function (filter, value) {
+                    $.ajax({
+                        url: '/Songs?Filter=' + filter + '&Value=' + value,
+                        dataType: 'json',
+                        success: function (results) {
+                            showView("#songs", { items: results, filter: filter, title: value });
+                        },
+                        error: function () {
+                            alert('Fail');
+                        }
+                    });
+                }
+                this.song = function (id) {
+                    $.ajax({
+                        url: '/Song?Id=' + id,
+                        dataType: 'json',
+                        success: function (result) {
+                            showView("#song", { song: result });
+                        },
+                        error: function () {
+                            alert('Fail');
+                        }
+                    });
+                }
+                this.play = function (id) {
+                    $.ajax({
+                        url: '/Push?Id=' + id,
+                        dataType: 'json',
+                        success: function (result) {
+                            //showView("#song", {song:result});
+                            $("#" + id).text("Queued");
+                        },
+                        error: function () {
+                            alert('Fail');
+                        }
+                    });
+                }
+
             }
 
             function showView(tmplName, model) {
@@ -106,20 +146,10 @@
 			
 		</script>
         <script id="default" type="text/x-jquery-tmpl">
-			<ul>
-				<li>
-					<a href="#/Songs/Popular">Most played</a>
-				</li>
-				<li>
-					<a href="#/List/Genre">Genres</a>
-				</li>
-				<li>
-					<a href="#/List/Artist">Artists</a>
-				</li>
-				<li>
-					<a href="#/List/Album">Albums</a>
-				</li>
-			</ul>
+			<h2><a href="#/Songs/Popular"><span>Most played</span></a></h2>
+			<h2><a href="#/List/Genre"><span>Genres</span></a></h2>
+			<h2><a href="#/List/Artist"><span>Artists</span></a></h2>
+			<h2><a href="#/List/Album"><span>Albums</span></h2>
         </script>
 		
 		<script id="list" type="text/x-jquery-tmpl">
@@ -145,9 +175,9 @@
         </script>
 
 		 <script id="song" type="text/x-jquery-tmpl">
-			${song.Title} by <a href="#/Songs/Artist/${song.Artist}">${song.Artist}</a>
+			<h2>${song.Title} by <a href="#/Songs/Artist/${song.Artist}">${song.Artist}</a></h2>
 			<br/><br/>
-			<button onclick="controllers.play('${song.Id}')">Play</button>
+			<span id="${song.Id}"><a href="javascript:void();" onclick="controllers.play('${song.Id}')">&#9654; Play</a></span>
         </script>
 
 
