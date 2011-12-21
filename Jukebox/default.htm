@@ -1,0 +1,155 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>Jukebox</title>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="http://documentcloud.github.com/underscore/underscore.js"></script>
+		<script type="text/javascript" src="http://documentcloud.github.com/backbone/backbone.js"></script>
+        <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    </head> 
+	<body>
+        <div id="body"></div>
+        <script language="javascript">
+
+            var controllers = new function () {
+                this.defaultAction = function () {
+                    showView("#default", {});
+                }
+				this.list = function(filter){
+					$.ajax({
+						url: '/List?Filter=' + filter,
+						dataType: 'json',
+						success: function (results) {
+							showView("#list", {items:results, filter:filter, title:filter});
+						},
+						error: function () {
+							alert('Fail');
+						}
+					});
+				
+				}
+				this.songs = function(filter, value){
+				    $.ajax({
+						url: '/Songs?Filter=' + filter + '&Value=' + value,
+						dataType: 'json',
+						success: function (results) {
+							showView("#songs", {items:results, filter:filter, title:value});
+						},
+						error: function () {
+							alert('Fail');
+						}
+					});
+				}
+				this.song = function(id){
+				    $.ajax({
+						url: '/Song?Id=' + id,
+						dataType: 'json',
+						success: function (result) {
+							showView("#song", {song:result});
+						},
+						error: function () {
+							alert('Fail');
+						}
+					});
+				}
+				this.play = function(id){
+				    $.ajax({
+						url: '/Push?Id=' + id,
+						dataType: 'json',
+						success: function (result) {
+							//showView("#song", {song:result});
+						},
+						error: function () {
+							alert('Fail');
+						}
+					});
+				}
+				
+            }
+
+            function showView(tmplName, model) {
+                $("#body").html($(tmplName).tmpl(model));
+            };
+
+            var AppRouter = Backbone.Router.extend({
+                routes: {
+					"/List/:filter": "list",
+					"/Songs/:filter/:value": "songs",
+					"/Songs/:filter": "songs",
+                    "/Song/:id": "song",
+                    "*actions": "defaultRoute"
+                },
+                defaultRoute: function (actions) {
+
+                    controllers.defaultAction();
+                },
+				songs: function(filter,value){
+					controllers.songs(filter, value);
+				},
+                song: function (id) {
+
+                    controllers.song(id);
+                },
+				list: function(filter){
+					controllers.list(filter);
+				}
+
+            });
+            // Initiate the router
+            var router = new AppRouter;
+
+            // execute the default action
+            $(document).ready(function () {
+                Backbone.history.start();
+                controllers.defaultAction();
+            });
+			
+		</script>
+        <script id="default" type="text/x-jquery-tmpl">
+			<ul>
+				<li>
+					<a href="#/Songs/Popular">Most played</a>
+				</li>
+				<li>
+					<a href="#/List/Genre">Genres</a>
+				</li>
+				<li>
+					<a href="#/List/Artist">Artists</a>
+				</li>
+				<li>
+					<a href="#/List/Album">Albums</a>
+				</li>
+			</ul>
+        </script>
+		
+		<script id="list" type="text/x-jquery-tmpl">
+			<h2>${title}</h2>
+			<ul>
+				{{each items}}
+				<li>
+					<a href="#/Songs/${filter}/${$value}">${$value}</a>
+				</li>
+				{{/each}}
+			</ul>
+        </script>
+
+        <script id="songs" type="text/x-jquery-tmpl">
+			<h2>${title}</h2>
+			<ul>
+				{{each items}}
+				<li>
+					<a href="#/Song/${$value.Id}">${$value.Title}</a> by <a href="#/Songs/Artist/${$value.Artist}">${$value.Artist}</a>
+				</li>
+				{{/each}}
+			</ul>
+        </script>
+
+		 <script id="song" type="text/x-jquery-tmpl">
+			${song.Title} by <a href="#/Songs/Artist/${song.Artist}">${song.Artist}</a>
+			<br/><br/>
+			<button onclick="controllers.play('${song.Id}')">Play</button>
+        </script>
+
+
+	</body>
+</html>
