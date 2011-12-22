@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.Script.Serialization;
 
 namespace Jukebox
 {
@@ -6,6 +7,7 @@ namespace Jukebox
     {
         public string Title { get; set; }
 
+        [ScriptIgnore]
         public string Location { get; set; }
 
         public int PlayCount { get; set; }
