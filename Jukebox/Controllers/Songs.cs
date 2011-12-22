@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Web.Script.Serialization;
 using Kayak.Http;
-using Jukebox;
 
 namespace Jukebox.Controllers
 {
@@ -31,7 +30,7 @@ namespace Jukebox.Controllers
                         query = query.OrderByDescending(s => s.LastPlayed);
                         break;
                     case "Popular":
-                        query = query.OrderByDescending(s => s.PlayCount);
+                        query = query.Where(s => s.PlayCount > 0).OrderByDescending(s => s.PlayCount);
                         break;
                     case "Queue":
                         query = Player.Queue;

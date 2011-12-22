@@ -20,11 +20,11 @@ namespace Jukebox
                 TagLib.File file = TagLib.File.Create(filename);
                 var song = new Song
                 {
-                    Title = file.Tag.Title ?? "Unknown Title",
+                    Title = file.Tag.Title.ToASCII() ?? "Unknown",
                     Location = filename,
-                    Artist = file.Tag.FirstAlbumArtist ?? "Unknown Artist",
-                    Album = file.Tag.Album ?? "Unknown Album",
-                    Genre = file.Tag.FirstGenre ?? "Unknown Genre",
+                    Artist = file.Tag.FirstAlbumArtist.ToASCII() ?? "Unknown",
+                    Album = file.Tag.Album.ToASCII() ?? "Unknown",
+                    Genre = file.Tag.FirstGenre.ToASCII() ?? "Unknown",
                     Id = Guid.NewGuid().ToString(),
                 };
 

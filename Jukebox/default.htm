@@ -7,12 +7,14 @@
 		<script type="text/javascript" src="http://documentcloud.github.com/backbone/backbone.js"></script>
         <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
         <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'/>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'/>
         <style type="text/css">
 body, input
 {
     background-color:#333;
     color:Silver;
-    font-family:helvetica,arial,freesans,clean,sans-serif;
+    font-family:'Open Sans', sans-serif;
+    font-weight:300;
     font-size : 25px;
 }
 input
@@ -25,11 +27,6 @@ input
 a
 {
     color:#40C4FF;    
-    text-decoration:none;
-}
-a:hover
-{
-    text-decoration:underline;    
 }
 #body
 {
@@ -42,13 +39,23 @@ a:hover
     font-size:80px;    
     margin-left:30px;
     font-family: 'Playball', cursive;
+    text-decoration:none;
 }
 h2
 {
     font-size:40px;    
     margin-top:0px;
     margin-bottom:0px;
-    font-family: 'Playball', cursive;
+    font-family: 'Open Sans', sans-serif;
+    font-weight:300;
+}
+a
+{
+    text-decoration:none;    
+}
+a:hover
+{
+    text-decoration:underline;
 }
 
         </style>
@@ -170,13 +177,17 @@ h2
 		</script>
         <script id="default" type="text/x-jquery-tmpl">
         <div>
+            <div>The web based music server<br/><br/></div>
             <input id="Search" onkeypress="if ((event.keyCode || event.which) == 13) {window.location = '#/Search/' + $('#Search').val();}"/> <a href="javascript:void();" onclick="window.location = '#/Search/' + $('#Search').val()">Search</a><br/>
-			<h2><a href="#/Songs/Current"><span>Now Playing</span></a></h2>
-			<h2><a href="#/Songs/Queue"><span>Queued</span></a></h2>
-			<h2><a href="#/Songs/Popular"><span>Most played</span></a></h2>
-			<h2><a href="#/List/Genre"><span>Genres</span></a></h2>
-			<h2><a href="#/List/Artist"><span>Artists</span></a></h2>
-			<h2><a href="#/List/Album"><span>Albums</span></h2>
+			<br/>
+            <h2>What's playing?</h2>
+            <div><a href="#/Songs/Current"><span>Now playing</span></a></div>
+			<div><a href="#/Songs/Queue"><span>Queued songs</span></a></div>
+			<div><a href="#/Songs/Popular"><span>Most played songs</span></a></div>
+            <h2>Browse the catalogue</h2>
+			<div><a href="#/List/Genre"><span>Browse by genre</span></a></div>
+			<div><a href="#/List/Artist"><span>Browse by artist</span></a></div>
+			<div><a href="#/List/Album"><span>Browse by album</span></div>
         </div>
         </script>
 		

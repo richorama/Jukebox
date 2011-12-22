@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Net;
 using Kayak;
 using Kayak.Http;
@@ -18,10 +19,19 @@ namespace Jukebox
 
         static void Main(string[] args)
         {
+            var path = ConfigurationManager.AppSettings["path"];
+            string[] paths = null;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                paths = new string[] { GetHome() };
+            }
+            else
+            {
+                paths = (path ?? "").Split(';');
+            }
 
-
-            Catalogue.Index(new string[] { GetHome() });//, @"C:\Users\richard.astbury\Dropbox\Music", @"C:\Users\Public\Music\Sample Music" });
-            Console.WriteLine("Indexed {0} songs", Catalogue.Songs.Count);
+            Action a = new Action(() => { Catalogue.Index(paths); });
+            a.BeginInvoke(null, null);
 
             var scheduler = KayakScheduler.Factory.Create(new SchedulerDelegate());
             scheduler.Post(() =>
