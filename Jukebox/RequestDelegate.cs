@@ -13,17 +13,9 @@ namespace Jukebox
             {
                 Console.WriteLine(request.Uri);
 
-                var content = Router.Execute(request);
-                content = content ?? string.Empty;
-                if (content.StartsWith("<"))
-                {
-                    Return200(response, content, "text/html");
-                }
-                else
-                {
-                    Return200(response, content, "text/plain");
-                }
-
+                string contentType = null;
+                var content = Router.Execute(request, out contentType) ?? string.Empty;
+                Return200(response, content, contentType ?? "text/plain");
 
             }
             catch (Exception ex)
@@ -33,7 +25,7 @@ namespace Jukebox
             }
         }
 
-        private static void Return200(IHttpResponseDelegate response, string content, string contentType)
+        private static void Return200(IHttpResponseDelegate response, object content, string contentType)
         {
             var headers = new HttpResponseHead()
             {
@@ -41,11 +33,21 @@ namespace Jukebox
                 Headers = new Dictionary<string, string>() 
                     {
                         { "Content-Type", contentType },
-                        { "Content-Length", content.Length.ToString() },
+                        { "Content-Length", (content is string) ? ((string) content).Length.ToString() : ((byte[]) content).Length.ToString() },
                     }
             };
 
-            var body = new BufferedProducer(content);
+
+            BufferedProducer body = null;
+            if (content is string)
+            {
+                body = new BufferedProducer(content as string);
+            }
+            else
+            {
+                body = new BufferedProducer(content as byte[]);
+            }
+
             response.OnResponse(headers, body);
         }
     }

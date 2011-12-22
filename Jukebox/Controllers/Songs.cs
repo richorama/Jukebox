@@ -8,7 +8,7 @@ namespace Jukebox.Controllers
     [Route(Url = "/songs")]
     class Songs : IController
     {
-        public string Execute(HttpRequestHead head, dynamic queryString)
+        public object Execute(HttpRequestHead head, dynamic queryString)
         {
             IEnumerable<Jukebox.Song> query = Catalogue.Songs as IEnumerable<Jukebox.Song>;
 
@@ -31,6 +31,17 @@ namespace Jukebox.Controllers
                         break;
                     case "Popular":
                         query = query.OrderByDescending(s => s.PlayCount);
+                        break;
+                    case "Queue":
+                        query = Player.Queue;
+                        break;
+                    case "Current":
+                        var songs = new List<Jukebox.Song>();
+                        if (null != Player.CurrentSong)
+                        {
+                            songs.Add(Player.CurrentSong);
+                        }
+                        query = songs.ToArray();
                         break;
                     default:
                         query = query.OrderBy(s => s.Title);

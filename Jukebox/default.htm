@@ -31,6 +31,7 @@ a:hover
 }
 .title
 {
+    width:600px;  
     font-size:80px;    
     margin-left:30px;
     font-family: 'Playball', cursive;
@@ -146,6 +147,8 @@ h2
 			
 		</script>
         <script id="default" type="text/x-jquery-tmpl">
+			<h2><a href="#/Songs/Current"><span>Now Playing</span></a></h2>
+			<h2><a href="#/Songs/Queue"><span>Queued</span></a></h2>
 			<h2><a href="#/Songs/Popular"><span>Most played</span></a></h2>
 			<h2><a href="#/List/Genre"><span>Genres</span></a></h2>
 			<h2><a href="#/List/Artist"><span>Artists</span></a></h2>
@@ -175,11 +178,19 @@ h2
         </script>
 
 		 <script id="song" type="text/x-jquery-tmpl">
-			<h2>${song.Title} by <a href="#/Songs/Artist/${song.Artist}">${song.Artist}</a></h2>
-			<br/><br/>
-			<span id="${song.Id}"><a href="javascript:void();" onclick="controllers.play('${song.Id}')">&#9654; Play</a></span>
+			<br/>
+            <a href="#/Songs/Album/${song.Album}">${song.Album}</a> Album<br/>
+            <a href="#/Songs/Genre/${song.Genre}">${song.Genre}</a> Genre<br/>
+            ${song.PlayCount} Plays<br/>
+            <br/>
+			<span id="${song.Id}"><a href="javascript:void();" onclick="controllers.play('${song.Id}')">&#9654; Play</a></span>&nbsp;&nbsp;&nbsp;
+            <a href="/download.mp3?Id=${song.Id}" type="audio/mpeg">&#9660; Download</a><br/><br/>
+            Play in browser<br/>
+            <audio controls="controls">
+                <source src="/download.mp3?Id=${song.Id}" type="audio/mpeg" />
+                <embed height="50px" width="100px" src="/download.mp3?Id=${song.Id}" />
+            </audio>
         </script>
-
 
 	</body>
 </html>

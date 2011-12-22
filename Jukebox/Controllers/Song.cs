@@ -7,7 +7,7 @@ namespace Jukebox.Controllers
     [Route(Url = "/song")]
     class Song : IController
     {
-        public string Execute(HttpRequestHead head, dynamic queryString)
+        public object Execute(HttpRequestHead head, dynamic queryString)
         {
             var song = Catalogue.Songs.Where(s => s.Id == queryString.Id).FirstOrDefault();
 

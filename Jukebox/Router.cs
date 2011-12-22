@@ -10,17 +10,19 @@ namespace Jukebox
     class Route : Attribute
     {
         public string Url { get; set; }
+        public string ContentType { get; set; }
     }
 
     interface IController
     {
-        string Execute(HttpRequestHead head, dynamic queryString);
+        object Execute(HttpRequestHead head, dynamic queryString);
     }
 
     static class Router
     {
 
         static Dictionary<string, IController> controllers = new Dictionary<string, IController>();
+        static Dictionary<string, string> contentTypes = new Dictionary<string, string>();
 
         static Router()
         {
@@ -34,10 +36,11 @@ namespace Jukebox
                 var controller = Activator.CreateInstance(type) as IController;
                 Route route = type.GetCustomAttributes(typeof(Route), false).First() as Route;
                 controllers.Add(route.Url.ToLower(), controller);
+                contentTypes.Add(route.Url.ToLower(), route.ContentType ?? "text/plain");
             }
         }
 
-        public static string Execute(HttpRequestHead head)
+        public static object Execute(HttpRequestHead head, out string contentType)
         {
             string path = (head.Uri ?? "").Split('?').First().ToLower();
 
@@ -60,8 +63,10 @@ namespace Jukebox
             if (controllers.ContainsKey(path))
             {
                 var controller = controllers[path];
+                contentType = contentTypes[path];
                 return controller.Execute(head, queryVariable);
             }
+            contentType = "text/plain";
             return null;
         }
 

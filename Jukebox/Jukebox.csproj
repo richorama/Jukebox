@@ -60,12 +60,12 @@
   <ItemGroup>
     <Compile Include="BufferedProducer.cs" />
     <Compile Include="Catalogue.cs" />
+    <Compile Include="Controllers\Download.cs" />
     <Compile Include="Controllers\List.cs" />
     <Compile Include="Controllers\Song.cs" />
     <Compile Include="Controllers\Home.cs" />
     <Compile Include="Controllers\Songs.cs" />
     <Compile Include="Controllers\Push.cs" />
-    <Compile Include="Controllers\Test.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

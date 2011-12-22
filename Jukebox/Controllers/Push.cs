@@ -6,7 +6,7 @@ namespace Jukebox.Controllers
     [Route(Url = "/push")]
     class Push : IController
     {
-        public string Execute(HttpRequestHead head, dynamic queryString)
+        public object Execute(HttpRequestHead head, dynamic queryString)
         {
             var song = (from s in Catalogue.Songs where s.Id == queryString.Id select s).FirstOrDefault();
             if (null != song)

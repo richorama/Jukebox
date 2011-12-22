@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using WMPLib;
 
@@ -26,9 +25,18 @@ namespace Jukebox
 
         private static WindowsMediaPlayer wmp { get; set; }
 
+        public static Song[] Queue
+        {
+            get
+            {
+                return queue.ToArray();
+            }
+        }
+
+        public static Song CurrentSong { get; private set; }
+
         private static void Play(Song song)
         {
-
             // update the song info
             song.PlayCount += 1;
             song.LastPlayed = DateTime.Now;
@@ -54,6 +62,7 @@ namespace Jukebox
             {
                 Play(song);
             }
+            CurrentSong = song;
         }
 
         public static int Push(Song song)

@@ -8,7 +8,7 @@ namespace Jukebox.Controllers
     [Route(Url = "/list")]
     class List : IController
     {
-        public string Execute(HttpRequestHead head, dynamic queryString)
+        public object Execute(HttpRequestHead head, dynamic queryString)
         {
             IEnumerable<string> query = null;
             switch ((string)queryString.Filter)

@@ -3,10 +3,10 @@ using Kayak.Http;
 
 namespace Jukebox.Controllers
 {
-    [Route(Url = "/")]
+    [Route(Url = "/", ContentType = "text/html")]
     class Home : IController
     {
-        public string Execute(HttpRequestHead head, dynamic queryString)
+        public object Execute(HttpRequestHead head, dynamic queryString)
         {
             using (var file = new StreamReader("default.htm"))
             {
