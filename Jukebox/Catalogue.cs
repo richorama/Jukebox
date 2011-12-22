@@ -34,7 +34,14 @@ namespace Jukebox
             // index child directories
             Parallel.ForEach<string>(paths, path =>
             {
-                Index(Directory.GetDirectories(path));
+                try
+                {
+                    Index(Directory.GetDirectories(path));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             });
         }
 
@@ -42,7 +49,17 @@ namespace Jukebox
         {
             foreach (string path in paths)
             {
-                foreach (var item in Directory.GetFiles(path, "*.mp3"))
+                string[] files = null;
+                try
+                {
+                    files = Directory.GetFiles(path, "*.mp3");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    continue;
+                }
+                foreach (var item in files)
                 {
                     yield return item;
                 }

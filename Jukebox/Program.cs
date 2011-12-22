@@ -9,9 +9,18 @@ namespace Jukebox
     {
         const int port = 1337;
 
+        private static string GetHome()
+        {
+            return (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                ? Environment.GetEnvironmentVariable("HOME")
+                : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+        }
+
         static void Main(string[] args)
         {
-            Catalogue.Index(new string[] { @"C:\Users\richard.astbury\Dropbox\Music", @"C:\Users\Public\Music\Sample Music" });
+
+
+            Catalogue.Index(new string[] { GetHome() });//, @"C:\Users\richard.astbury\Dropbox\Music", @"C:\Users\Public\Music\Sample Music" });
             Console.WriteLine("Indexed {0} songs", Catalogue.Songs.Count);
 
             var scheduler = KayakScheduler.Factory.Create(new SchedulerDelegate());

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Script.Serialization;
 using Kayak.Http;
+using Jukebox;
 
 namespace Jukebox.Controllers
 {
@@ -42,6 +43,13 @@ namespace Jukebox.Controllers
                             songs.Add(Player.CurrentSong);
                         }
                         query = songs.ToArray();
+                        break;
+                    case "Search":
+                        query = query.Where(s =>
+                            Extensions.Contains(s.Artist, queryString.Value, true)
+                            || Extensions.Contains(s.Album, queryString.Value, true)
+                            || Extensions.Contains(s.Title, queryString.Value, true)
+                            || Extensions.Contains(s.Genre, queryString.Value, true));
                         break;
                     default:
                         query = query.OrderBy(s => s.Title);

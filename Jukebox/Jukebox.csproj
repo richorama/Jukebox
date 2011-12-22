@@ -66,6 +66,7 @@
     <Compile Include="Controllers\Home.cs" />
     <Compile Include="Controllers\Songs.cs" />
     <Compile Include="Controllers\Push.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,14 +6,21 @@
 		<script type="text/javascript" src="http://documentcloud.github.com/underscore/underscore.js"></script>
 		<script type="text/javascript" src="http://documentcloud.github.com/backbone/backbone.js"></script>
         <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
-        <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'>
-        <style>
-body
+        <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'/>
+        <style type="text/css">
+body, input
 {
     background-color:#333;
     color:Silver;
     font-family:helvetica,arial,freesans,clean,sans-serif;
     font-size : 25px;
+}
+input
+{
+    border: 1px solid #40C4FF;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 a
 {
@@ -49,7 +56,7 @@ h2
 	<body>
         <div class="title"><a href="#">Jukebox</a></div>
         <div id="body"></div>
-        <script language="javascript">
+        <script language="javascript" type="text/javascript">
 
             var controllers = new function () {
                 this.defaultAction = function () {
@@ -80,6 +87,18 @@ h2
                         }
                     });
                 }
+                this.search = function (value) {
+                    $.ajax({
+                        url: '/Songs?Filter=Search&Value=' + value,
+                        dataType: 'json',
+                        success: function (results) {
+                            showView("#searchResults", { items: results, filter: "Search", title: "Search results for " + value, value:value });
+                        },
+                        error: function () {
+                            alert('Fail');
+                        }
+                    });
+                }
                 this.song = function (id) {
                     $.ajax({
                         url: '/Song?Id=' + id,
@@ -97,7 +116,6 @@ h2
                         url: '/Push?Id=' + id,
                         dataType: 'json',
                         success: function (result) {
-                            //showView("#song", {song:result});
                             $("#" + id).text("Queued");
                         },
                         error: function () {
@@ -117,7 +135,8 @@ h2
 					"/List/:filter": "list",
 					"/Songs/:filter/:value": "songs",
 					"/Songs/:filter": "songs",
-                    "/Song/:id": "song",
+					"/Song/:id": "song",
+                    "/Search/:value": "search",
                     "*actions": "defaultRoute"
                 },
                 defaultRoute: function (actions) {
@@ -133,7 +152,10 @@ h2
                 },
 				list: function(filter){
 					controllers.list(filter);
-				}
+				},
+                search: function(value){
+                    controllers.search(value);
+                }
 
             });
             // Initiate the router
@@ -147,12 +169,15 @@ h2
 			
 		</script>
         <script id="default" type="text/x-jquery-tmpl">
+        <div>
+            <input id="Search" onkeypress="if ((event.keyCode || event.which) == 13) {window.location = '#/Search/' + $('#Search').val();}"/> <a href="javascript:void();" onclick="window.location = '#/Search/' + $('#Search').val()">Search</a><br/>
 			<h2><a href="#/Songs/Current"><span>Now Playing</span></a></h2>
 			<h2><a href="#/Songs/Queue"><span>Queued</span></a></h2>
 			<h2><a href="#/Songs/Popular"><span>Most played</span></a></h2>
 			<h2><a href="#/List/Genre"><span>Genres</span></a></h2>
 			<h2><a href="#/List/Artist"><span>Artists</span></a></h2>
 			<h2><a href="#/List/Album"><span>Albums</span></h2>
+        </div>
         </script>
 		
 		<script id="list" type="text/x-jquery-tmpl">
@@ -168,6 +193,19 @@ h2
 
         <script id="songs" type="text/x-jquery-tmpl">
 			<h2>${title}</h2>
+			<ul>
+				{{each items}}
+				<li>
+					<a href="#/Song/${$value.Id}">${$value.Title}</a> by <a href="#/Songs/Artist/${$value.Artist}">${$value.Artist}</a>
+				</li>
+				{{/each}}
+			</ul>
+        </script>
+
+        
+        <script id="searchResults" type="text/x-jquery-tmpl">
+			<h2>${title}</h2>
+            <input value="${value}" id="Search" onkeypress="if ((event.keyCode || event.which) == 13) {window.location = '#/Search/' + $('#Search').val();}"/> <a href="javascript:void();" onclick="window.location = '#/Search/' + $('#Search').val()">Search</a><br/>
 			<ul>
 				{{each items}}
 				<li>
