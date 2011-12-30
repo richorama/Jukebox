@@ -6,6 +6,7 @@
 		<script type="text/javascript" src="http://documentcloud.github.com/underscore/underscore.js"></script>
 		<script type="text/javascript" src="http://documentcloud.github.com/backbone/backbone.js"></script>
         <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+        <script type="text/javascript" src="http://dl.dropbox.com/u/624582/faye-browser.js"></script>
         <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'/>
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'/>
         <style type="text/css">
@@ -41,6 +42,11 @@ a
     font-family: 'Playball', cursive;
     text-decoration:none;
 }
+.subtitle
+{
+    margin-top:-30px;    
+    margin-left:60px;
+}
 h2
 {
     font-size:40px;    
@@ -57,17 +63,42 @@ a:hover
 {
     text-decoration:underline;
 }
-
+.current
+{
+    margin:30px;    
+}
         </style>
     </head> 
 	<body>
         <div class="title"><a href="#">Jukebox</a></div>
+        <div class="subtitle">web music server</div>
+        <div class="current" id="current"></div>
         <div id="body"></div>
+
         <script language="javascript" type="text/javascript">
+
+            var client = new Faye.Client('http://' + location.hostname + ':8000/faye');
+
+            var subscription = client.subscribe('/current', function (message) {
+                controllers.getCurrentSong();
+            });
 
             var controllers = new function () {
                 this.defaultAction = function () {
                     showView("#default", {});
+                }
+                this.getCurrentSong = function()
+                {
+                    $.ajax({
+                        url: '/Songs?Filter=Current&Value=',
+                        dataType: 'json',
+                        success: function (results) {
+                            $("#current").html($("#nowplaying").tmpl({ items: results }));
+                        },
+                        error: function () {
+                            alert('Fail');
+                        }
+                    });
                 }
                 this.list = function (filter) {
                     $.ajax({
@@ -99,7 +130,7 @@ a:hover
                         url: '/Songs?Filter=Search&Value=' + value,
                         dataType: 'json',
                         success: function (results) {
-                            showView("#searchResults", { items: results, filter: "Search", title: "Search results for " + value, value:value });
+                            showView("#searchResults", { items: results, filter: "Search", title: "Search results for " + value, value: value });
                         },
                         error: function () {
                             alert('Fail');
@@ -172,12 +203,12 @@ a:hover
             $(document).ready(function () {
                 Backbone.history.start();
                 controllers.defaultAction();
+                controllers.getCurrentSong();
             });
 			
 		</script>
         <script id="default" type="text/x-jquery-tmpl">
         <div>
-            <div>The web based music server<br/><br/></div>
             <input id="Search" onkeypress="if ((event.keyCode || event.which) == 13) {window.location = '#/Search/' + $('#Search').val();}"/> <a href="javascript:void();" onclick="window.location = '#/Search/' + $('#Search').val()">Search</a><br/>
 			<br/>
             <h2>What's playing?</h2>
@@ -208,9 +239,16 @@ a:hover
 				{{each items}}
 				<li>
 					<a href="#/Song/${$value.Id}">${$value.Title}</a> by <a href="#/Songs/Artist/${$value.Artist}">${$value.Artist}</a>
-				</li>
+				    <span id="${$value.Id}"><a href="javascript:void();" onclick="controllers.play('${$value.Id}')">&#9654;</a></span>
+                </li>
 				{{/each}}
 			</ul>
+        </script>
+
+       <script id="nowplaying" type="text/x-jquery-tmpl">
+			{{each items}}
+				Playing <a href="#/Song/${$value.Id}">${$value.Title}</a> by <a href="#/Songs/Artist/${$value.Artist}">${$value.Artist}</a>
+			{{/each}}
         </script>
 
         
@@ -221,6 +259,7 @@ a:hover
 				{{each items}}
 				<li>
 					<a href="#/Song/${$value.Id}">${$value.Title}</a> by <a href="#/Songs/Artist/${$value.Artist}">${$value.Artist}</a>
+				    <span id="${$value.Id}"><a href="javascript:void();" onclick="controllers.play('${$value.Id}')">&#9654;</a></span>
 				</li>
 				{{/each}}
 			</ul>

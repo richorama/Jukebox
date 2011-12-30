@@ -22,7 +22,7 @@ namespace Jukebox
                 {
                     Title = file.Tag.Title.ToASCII() ?? "Unknown",
                     Location = filename,
-                    Artist = file.Tag.FirstAlbumArtist.ToASCII() ?? "Unknown",
+                    Artist = file.Tag.FirstAlbumArtist.ToASCII() ?? file.Tag.FirstPerformer.ToASCII() ?? "Unknown",
                     Album = file.Tag.Album.ToASCII() ?? "Unknown",
                     Genre = file.Tag.FirstGenre.ToASCII() ?? "Unknown",
                     Id = Guid.NewGuid().ToString(),

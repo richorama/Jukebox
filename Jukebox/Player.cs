@@ -61,7 +61,13 @@ namespace Jukebox
             if (queue.TryDequeue(out song))
             {
                 Play(song);
+                Publisher.Message(song);
             }
+            else
+            {
+                Publisher.Message(null);
+            }
+
             CurrentSong = song;
         }
 
