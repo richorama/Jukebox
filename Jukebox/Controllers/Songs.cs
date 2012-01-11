@@ -1,68 +1,70 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web.Script.Serialization;
-using Kayak.Http;
+using Nancy;
 
 namespace Jukebox.Controllers
 {
-    [Route(Url = "/songs")]
-    class Songs : IController
+    public class Songs : NancyModule
     {
-        public object Execute(HttpRequestHead head, dynamic queryString)
+        public Songs()
+        {
+            Get["/Songs/{Filter}/{Value}"] = x =>
+            {
+                return QuerySongs(x.Filter, x.Value);
+            };
+            Get["/Songs/{Filter}"] = x =>
+            {
+                return QuerySongs(x.Filter, "");
+            };
+        }
+
+        private Nancy.Response QuerySongs(string filter, string value)
         {
             IEnumerable<Jukebox.Song> query = Catalogue.Songs as IEnumerable<Jukebox.Song>;
 
-            var dictionary = queryString as IDictionary<string, object>;
-            if (dictionary.ContainsKey("Filter"))
+            switch (filter)
             {
-                switch ((string)queryString.Filter)
-                {
-                    case "Genre":
-                        query = query.Where(s => string.Compare(s.Genre, queryString.Value, false) == 0).OrderBy(s => s.Title);
-                        break;
-                    case "Album":
-                        query = query.Where(s => string.Compare(s.Album, queryString.Value, false) == 0).OrderBy(s => s.Title);
-                        break;
-                    case "Artist":
-                        query = query.Where(s => string.Compare(s.Artist, queryString.Value, false) == 0).OrderBy(s => s.Title);
-                        break;
-                    case "Latest":
-                        query = query.OrderByDescending(s => s.LastPlayed);
-                        break;
-                    case "Popular":
-                        query = query.Where(s => s.PlayCount > 0).OrderByDescending(s => s.PlayCount);
-                        break;
-                    case "Queue":
-                        query = Player.Queue;
-                        break;
-                    case "Current":
-                        var songs = new List<Jukebox.Song>();
-                        if (null != Player.CurrentSong)
-                        {
-                            songs.Add(Player.CurrentSong);
-                        }
-                        query = songs.ToArray();
-                        break;
-                    case "Search":
-                        query = query.Where(s =>
-                            Extensions.Contains(s.Artist, queryString.Value, true)
-                            || Extensions.Contains(s.Album, queryString.Value, true)
-                            || Extensions.Contains(s.Title, queryString.Value, true)
-                            || Extensions.Contains(s.Genre, queryString.Value, true));
-                        break;
-                    default:
-                        query = query.OrderBy(s => s.Title);
-                        break;
-                }
-            }
-            else
-            {
-                query = query.OrderBy(s => s.Title);
+                case "Genre":
+                    query = query.Where(s => string.Compare(s.Genre, value, false) == 0).OrderBy(s => s.Title);
+                    break;
+                case "Album":
+                    query = query.Where(s => string.Compare(s.Album, value, false) == 0).OrderBy(s => s.Title);
+                    break;
+                case "Artist":
+                    query = query.Where(s => string.Compare(s.Artist, value, false) == 0).OrderBy(s => s.Title);
+                    break;
+                case "Latest":
+                    query = query.OrderByDescending(s => s.LastPlayed);
+                    break;
+                case "Popular":
+                    query = query.Where(s => s.PlayCount > 0).OrderByDescending(s => s.PlayCount);
+                    break;
+                case "Queue":
+                    query = Player.Queue;
+                    break;
+                case "Current":
+                    var songs = new List<Jukebox.Song>();
+                    if (null != Player.CurrentSong)
+                    {
+                        songs.Add(Player.CurrentSong);
+                    }
+                    query = songs.ToArray();
+                    break;
+                case "Search":
+                    query = query.Where(s =>
+                        Extensions.Contains(s.Artist, value, true)
+                        || Extensions.Contains(s.Album, value, true)
+                        || Extensions.Contains(s.Title, value, true)
+                        || Extensions.Contains(s.Genre, value, true));
+                    break;
+                default:
+                    query = query.OrderBy(s => s.Title);
+                    break;
             }
 
-            JavaScriptSerializer jss = new JavaScriptSerializer();
-            return jss.Serialize(query.ToArray());
+            return Response.AsJson(query.ToArray());
         }
-
     }
+
+
 }

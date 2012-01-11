@@ -1,19 +1,21 @@
 ﻿using System.Linq;
-using Kayak.Http;
+using Nancy;
 
 namespace Jukebox.Controllers
 {
-    [Route(Url = "/push")]
-    class Push : IController
+    public class Push : NancyModule
     {
-        public object Execute(HttpRequestHead head, dynamic queryString)
+        public Push()
         {
-            var song = (from s in Catalogue.Songs where s.Id == queryString.Id select s).FirstOrDefault();
-            if (null != song)
+            Get["/push/{Id}"] = x =>
             {
-                return Player.Push(song).ToString();
-            }
-            return "";
+                var song = (from s in Catalogue.Songs where s.Id == (string)x.Id select s).FirstOrDefault();
+                if (null != song)
+                {
+                    return Player.Push(song).ToString();
+                }
+                return Response.AsJson("");
+            };
         }
 
     }

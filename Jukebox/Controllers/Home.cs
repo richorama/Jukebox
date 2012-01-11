@@ -1,17 +1,15 @@
-﻿using System.IO;
-using Kayak.Http;
+﻿using Nancy;
 
 namespace Jukebox.Controllers
 {
-    [Route(Url = "/", ContentType = "text/html")]
-    class Home : IController
+    public class Home : NancyModule
     {
-        public object Execute(HttpRequestHead head, dynamic queryString)
+        public Home()
         {
-            using (var file = new StreamReader("default.htm"))
+            Get["/"] = x =>
             {
-                return file.ReadToEnd();
-            }
+                return Response.AsFile("default.htm");
+            };
         }
 
     }

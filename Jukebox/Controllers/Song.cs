@@ -1,18 +1,17 @@
 ﻿using System.Linq;
-using System.Web.Script.Serialization;
-using Kayak.Http;
+using Nancy;
 
 namespace Jukebox.Controllers
 {
-    [Route(Url = "/song")]
-    class Song : IController
+    public class Song : NancyModule
     {
-        public object Execute(HttpRequestHead head, dynamic queryString)
+        public Song()
         {
-            var song = Catalogue.Songs.Where(s => s.Id == queryString.Id).FirstOrDefault();
-
-            JavaScriptSerializer jss = new JavaScriptSerializer();
-            return jss.Serialize(song);
+            Get["/song/{Id}"] = x =>
+            {
+                var song = Catalogue.Songs.Where(s => s.Id == (string)x.Id).FirstOrDefault();
+                return Response.AsJson(song);
+            };
         }
 
     }

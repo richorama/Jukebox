@@ -6,7 +6,6 @@
 		<script type="text/javascript" src="http://documentcloud.github.com/underscore/underscore.js"></script>
 		<script type="text/javascript" src="http://documentcloud.github.com/backbone/backbone.js"></script>
         <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
-        <script type="text/javascript" src="http://dl.dropbox.com/u/624582/faye-browser.js"></script>
         <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'/>
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'/>
         <style type="text/css">
@@ -77,11 +76,11 @@ a:hover
 
         <script language="javascript" type="text/javascript">
 
-            var client = new Faye.Client('http://' + location.hostname + ':8000/faye');
+            function poll() {
 
-            var subscription = client.subscribe('/current', function (message) {
                 controllers.getCurrentSong();
-            });
+                setTimeout("poll();", 10000);
+            }
 
             var controllers = new function () {
                 this.defaultAction = function () {
@@ -90,7 +89,7 @@ a:hover
                 this.getCurrentSong = function()
                 {
                     $.ajax({
-                        url: '/Songs?Filter=Current&Value=',
+                        url: '/Songs/Current/',
                         dataType: 'json',
                         success: function (results) {
                             $("#current").html($("#nowplaying").tmpl({ items: results }));
@@ -102,7 +101,7 @@ a:hover
                 }
                 this.list = function (filter) {
                     $.ajax({
-                        url: '/List?Filter=' + filter,
+                        url: '/List/' + filter,
                         dataType: 'json',
                         success: function (results) {
                             showView("#list", { items: results, filter: filter, title: filter + "s" });
@@ -115,7 +114,7 @@ a:hover
                 }
                 this.songs = function (filter, value) {
                     $.ajax({
-                        url: '/Songs?Filter=' + filter + '&Value=' + value,
+                        url: '/Songs/' + filter + '/' + value,
                         dataType: 'json',
                         success: function (results) {
                             showView("#songs", { items: results, filter: filter, title: value });
@@ -127,7 +126,7 @@ a:hover
                 }
                 this.search = function (value) {
                     $.ajax({
-                        url: '/Songs?Filter=Search&Value=' + value,
+                        url: '/Songs/Search/' + value,
                         dataType: 'json',
                         success: function (results) {
                             showView("#searchResults", { items: results, filter: "Search", title: "Search results for " + value, value: value });
@@ -139,7 +138,7 @@ a:hover
                 }
                 this.song = function (id) {
                     $.ajax({
-                        url: '/Song?Id=' + id,
+                        url: '/Song/' + id,
                         dataType: 'json',
                         success: function (result) {
                             showView("#song", { song: result });
@@ -151,7 +150,7 @@ a:hover
                 }
                 this.play = function (id) {
                     $.ajax({
-                        url: '/Push?Id=' + id,
+                        url: '/Push/' + id,
                         dataType: 'json',
                         success: function (result) {
                             $("#" + id).text("Queued");
@@ -203,23 +202,23 @@ a:hover
             $(document).ready(function () {
                 Backbone.history.start();
                 controllers.defaultAction();
-                controllers.getCurrentSong();
+                poll();
             });
 			
 		</script>
         <script id="default" type="text/x-jquery-tmpl">
-        <div>
+     
             <input id="Search" onkeypress="if ((event.keyCode || event.which) == 13) {window.location = '#/Search/' + $('#Search').val();}"/> <a href="javascript:void();" onclick="window.location = '#/Search/' + $('#Search').val()">Search</a><br/>
 			<br/>
             <h2>What's playing?</h2>
-            <div><a href="#/Songs/Current"><span>Now playing</span></a></div>
-			<div><a href="#/Songs/Queue"><span>Queued songs</span></a></div>
-			<div><a href="#/Songs/Popular"><span>Most played songs</span></a></div>
+            <div><a href="#/Songs/Current">Now playing</a></div>
+			<div><a href="#/Songs/Queue">Queued songs</a></div>
+			<div><a href="#/Songs/Popular">Most played songs</a></div>
             <h2>Browse the catalogue</h2>
-			<div><a href="#/List/Genre"><span>Browse by genre</span></a></div>
-			<div><a href="#/List/Artist"><span>Browse by artist</span></a></div>
-			<div><a href="#/List/Album"><span>Browse by album</span></div>
-        </div>
+			<div><a href="#/List/Genre">Browse by genre</a></div>
+			<div><a href="#/List/Artist">Browse by artist</a></div>
+			<div><a href="#/List/Album">Browse by album</div>
+        
         </script>
 		
 		<script id="list" type="text/x-jquery-tmpl">
@@ -274,11 +273,6 @@ a:hover
             <br/>
 			<span id="${song.Id}"><a href="javascript:void();" onclick="controllers.play('${song.Id}')">&#9654; Play</a></span>&nbsp;&nbsp;&nbsp;
             <a href="/download.mp3?Id=${song.Id}" type="audio/mpeg">&#9660; Download</a><br/><br/>
-            Play in browser<br/>
-            <audio controls="controls">
-                <source src="/download.mp3?Id=${song.Id}" type="audio/mpeg" />
-                <embed height="50px" width="100px" src="/download.mp3?Id=${song.Id}" />
-            </audio>
         </script>
 
 	</body>

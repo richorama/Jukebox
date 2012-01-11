@@ -1,11 +1,21 @@
 ﻿using System;
 using System.Configuration;
-using System.Net;
-using Kayak;
-using Kayak.Http;
+using Nancy;
 
 namespace Jukebox
 {
+    /*
+    public class Module : NancyModule
+    {
+        public Module()
+        {
+            Get["/greet/{name}"] = x =>
+            {
+                return string.Concat("Hello ", x.name);
+            };
+        }
+    }*/
+
     class Program
     {
         const int port = 1337;
@@ -33,17 +43,11 @@ namespace Jukebox
             Action a = new Action(() => { Catalogue.Index(paths); });
             a.BeginInvoke(null, null);
 
-            var scheduler = KayakScheduler.Factory.Create(new SchedulerDelegate());
-            scheduler.Post(() =>
-            {
-                KayakServer.Factory
-                    .CreateHttp(new RequestDelegate(), scheduler)
-                    .Listen(new IPEndPoint(IPAddress.Any, port));
-            });
 
+            var nancyHost = new Nancy.Hosting.Self.NancyHost(new Uri("http://localhost:1337"));
             Console.WriteLine("Web server started on port {0}", port);
-            scheduler.Start();
-
+            nancyHost.Start();
+            Console.ReadLine();
         }
     }
 }
